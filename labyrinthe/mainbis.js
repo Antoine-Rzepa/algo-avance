@@ -1,6 +1,6 @@
 
 let size = 6;
-let type = "ex-0"
+let type = "ex-2";
 
 
 function showLabyrinthe() {
@@ -56,7 +56,6 @@ labyrinthe.forEach(room => {
 
 async function findWay(labyrinthe, startRoom) {
 
-    console.log(labyrinthe);
     let path = [];
     let stack = [];
     stack.push(startRoom);
@@ -67,7 +66,6 @@ async function findWay(labyrinthe, startRoom) {
             let vVisual = document.getElementById('room-' + labyrinthe.indexOf(v) + '')
             vVisual.style.backgroundColor = "purple"
         }
-        path.push(v)
         await new Promise((resolve) => setTimeout(resolve, 100));
         if (!v.visited) {
             v.visited = true;
@@ -77,7 +75,6 @@ async function findWay(labyrinthe, startRoom) {
             }
             let d = [-size, 1, size, -1]
             let indexV = labyrinthe.indexOf(v);
-            v.neighboursCount = 0;
             v.walls.forEach((wall, index) => {
                 let indexW;
                 if (!wall) {
@@ -85,23 +82,22 @@ async function findWay(labyrinthe, startRoom) {
                     let w = labyrinthe[indexW]
                     if (!w.visited) {
                         w.parent = v
-                        v.neighboursCount++;
                         stack.push(w)
-                        //path.push(w)
                     }
                 }
             })
-            if (v.neighboursCount===0) {
-                while(path[path.length-1].neighboursCount<2) {
-                    path.pop();
-                }
-            }
             if (v.exit) {
+                while (v.parent){
+                    let parent = v.parent;
+                    path.push(parent)
+                    v = parent;
+                }
                 path.forEach(cell => {
-                    let cellVisual = document.getElementById('room-' + labyrinthe.indexOf(cell) + '')
-                    cellVisual.style.backgroundColor = "blue"
+                    if(!cell.entrance){
+                        let cellVisual = document.getElementById('room-' + labyrinthe.indexOf(cell) + '')
+                        cellVisual.style.backgroundColor = "blue"
+                    }
                 })
-                console.log(path)
                 return path;
             }
         }
