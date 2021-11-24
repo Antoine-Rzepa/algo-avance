@@ -1,6 +1,6 @@
 
-let size = 6;
-let type = "ex-2";
+let size = 15;
+let type = "ex-0";
 
 
 function showLabyrinthe() {
@@ -54,7 +54,7 @@ labyrinthe.forEach(room => {
     room.visited = false;
 })
 
-async function findWay(labyrinthe, startRoom) {
+async function findWayIterative(labyrinthe, startRoom) {
 
     let path = [];
     let stack = [];
@@ -102,6 +102,50 @@ async function findWay(labyrinthe, startRoom) {
             }
         }
     }
+    return undefined;
+}
+
+
+async function findWayRecursive(labyrinthe, v){
+     if (!v.entrance && !v.exit) {
+         let vVisual = document.getElementById('room-' + labyrinthe.indexOf(v) + '')
+         vVisual.style.backgroundColor = "purple"
+     }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (!v.visited) {
+        v.visited = true;
+        if (!v.entrance && !v.exit) {
+            let vVisual = document.getElementById('room-' + labyrinthe.indexOf(v) + '')
+            vVisual.style.backgroundColor = "rgba(0, 128, 0,0.7)"
+        }
+        if (v.exit) {
+            return v;
+        }
+        let d = [-size, 1, size, -1];
+        let indexV = labyrinthe.indexOf(v);
+        for (const index in v.walls) {
+            const wall = v.walls[index];
+            let indexW;
+            if (!wall) {
+                indexW = indexV + d[index];
+                let w = labyrinthe[indexW]
+                if (!w.visited) {
+                    w.parent = v;
+                    let path = await findWayRecursive(labyrinthe, w)
+                    if (path === w){
+                        while (path.parent){
+                            if(!path.parent.entrance){
+                                let cellVisual = document.getElementById('room-' + labyrinthe.indexOf(path.parent) + '')
+                                cellVisual.style.backgroundColor = "blue"
+                            }
+                            path = path.parent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return undefined;
 }
 
