@@ -1,5 +1,5 @@
 
-let size = 15;
+let size = 20;
 let type = "ex-0";
 
 
@@ -146,6 +146,57 @@ async function findWayRecursive(labyrinthe, v){
         }
     }
 
+    return undefined;
+}
+
+async function findWayBFS(labyrinthe, startRoom) {
+
+    let path = [];
+    let queue = [];
+    queue.push(startRoom);
+
+    while (queue.length !== 0) {
+        let v = queue.shift()
+        if (!v.entrance && !v.exit) {
+            let vVisual = document.getElementById('room-' + labyrinthe.indexOf(v) + '')
+            vVisual.style.backgroundColor = "purple"
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        if (!v.visited) {
+            v.visited = true;
+            if (!v.entrance && !v.exit) {
+                let vVisual = document.getElementById('room-' + labyrinthe.indexOf(v) + '')
+                vVisual.style.backgroundColor = "rgba(0, 128, 0,0.7)"
+            }
+            let d = [-size, 1, size, -1]
+            let indexV = labyrinthe.indexOf(v);
+            v.walls.forEach((wall, index) => {
+                let indexW;
+                if (!wall) {
+                    indexW = indexV + d[index];
+                    let w = labyrinthe[indexW]
+                    if (!w.visited) {
+                        w.parent = v
+                        queue.push(w)
+                    }
+                }
+            })
+            if (v.exit) {
+                while (v.parent){
+                    let parent = v.parent;
+                    path.push(parent)
+                    v = parent;
+                }
+                path.forEach(cell => {
+                    if(!cell.entrance){
+                        let cellVisual = document.getElementById('room-' + labyrinthe.indexOf(cell) + '')
+                        cellVisual.style.backgroundColor = "blue"
+                    }
+                })
+                return path;
+            }
+        }
+    }
     return undefined;
 }
 
